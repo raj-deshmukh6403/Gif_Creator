@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIF Creator | Easy Image to GIF Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3f37c9;
+            --secondary: #f72585;
+            --success: #4cc9f0;
+            --dark: #131b23;
+            --light: #f8f9fa;
+            --gray: #e9ecef;
+            --light-gray: #f1f3f5;
+            --danger: #e63946;
+            --radius: 8px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo i {
+            font-size: 30px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--gray);
+        }
+
+        .step.active {
+            background-color: var(--primary);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-light);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background-color: var(--light-gray);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary-light);
+            margin-bottom: 15px;
+        }
+
+        .upload-area h3 {
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .upload-tab {
+            padding: 10px 20px;
+            background-color: var(--light-gray);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .upload-tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .upload-content {
+            display: none;
+        }
+
+        .upload-content.active {
+            display: block;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            height: 100px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .preview-item:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .options-section {
+            background-color: var(--light-gray);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .options-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .options-header h3 {
+            font-size: 18px;
+            color: var(--primary-dark);
+        }
+
+        .options-body {
+            display: none;
+        }
+
+        .options-body.show {
+            display: block;
+        }
+
+        .range-slider {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--gray);
+            outline: none;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .value-indicator {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .result-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-gif {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #3db8de;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
+        }
+
+        .flash-messages {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: var(--radius);
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #e63946;
+        }
+
+        .flash-messages p {
+            margin: 5px 0;
+        }
+
+        footer {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 20px 0;
+            margin-top: auto;
+        }
+
+        footer p {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .loading-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>GIF Creator</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <p><i class="fas fa-exclamation-circle"></i> {{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Create Your GIF</h2>
+                    <div class="step-indicator">
+                        <div class="step active" title="Upload Images"></div>
+                        <div class="step {% if gif_path %}active{% endif %}" title="View Result"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="/upload" method="post" enctype="multipart/form-data" id="gif-form">
+                        <div id="upload-section" {% if gif_path %}style="display: none;"{% endif %}>
+                            <div class="upload-options">
+                                <div class="upload-tab active" data-tab="files">Upload Files</div>
+                                <div class="upload-tab" data-tab="folder">Upload Folder</div>
+                            </div>
+                            
+                            <div class="upload-content active" id="files-content">
+                                <div class="upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <h3>Upload Your Images</h3>
+                                    <p>Select multiple images to create your GIF</p>
+                                    <div class="upload-btn">
+                                        <i class="fas fa-plus"></i> Choose Images
+                                    </div>
+                                    <input type="file" name="files" id="files" multiple required accept="image/*" onchange="handleFileUpload(this)">
+                                </div>
+                            </div>
+                            
+                            <div class="upload-content" id="folder-content">
+                                <div class="upload-area">
+                                    <i class="fas fa-folder-open"></i>
+                                    <h3>Upload Image Folder</h3>
+                                    <p>Select a folder containing images</p>
+                                    <div class="upload-btn">
+                                        <i class="fas fa-folder-plus"></i> Choose Folder
+                                    </div>
+                                    <input type="file" name="folder" id="folder" webkitdirectory multiple required accept="image/*" onchange="handleFileUpload(this)">
+                                </div>
+                            </div>
+
+                            <div id="preview-container" class="preview-container"></div>
+
+                            <div id="form-options" style="margin-top: 25px; display: none;">
+                                <div class="control-group">
+                                    <label for="gif_name">GIF Name</label>
+                                    <input type="text" class="form-control" name="gif_name" id="gif_name" required placeholder="my_awesome_gif">
+                                </div>
+
+                                <div class="options-section">
+                                    <div class="options-header" onclick="toggleOptions()">
+                                        <h3>Advanced Options</h3>
+                                        <i class="fas fa-chevron-down" id="options-toggle-icon"></i>
+                                    </div>
+                                    <div class="options-body" id="options-body">
+                                        <div class="form-row">
+                                            <div class="form-col">
+                                                <div class="control-group">
+                                                    <label for="duration">Frame Duration (seconds)</label>
+                                                    <input type="range" class="range-slider" id="duration" name="duration" min="0.1" max="2" step="0.1" value="0.5" oninput="updateDurationValue(this.value)">
+                                                    <div class="value-indicator" id="duration-value">0.5s</div>
+                                                </div>
+                                            </div>
+                                            <div class="form-col">
+                                                <div class="control-group">
+                                                    <label for="loop">Loop Count (0 = infinite)</label>
+                                                    <input type="number" class="form-control" id="loop" name="loop" min="0" max="100" value="0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 25px;">
+                                    <i class="fas fa-magic"></i> Generate GIF
+                                </button>
+                            </div>
+                        </div>
+
+                        {% if gif_path %}
+                        <div class="result-section">
+                            <h3 style="margin-bottom: 20px; color: var(--primary-dark);">Your GIF is Ready!</h3>
+                            <img src="{{ url_for('static', filename='gifs/' + gif_path) }}" alt="Generated GIF" class="result-gif">
+                            <div class="action-buttons">
+                                <!-- Include file paths as query parameters for cleanup -->
+                                <a href="{{ url_for('download', filename=gif_path, file_paths=session_data.file_paths) }}" download class="btn btn-success">
+                                    <i class="fas fa-download"></i> Download GIF
+                                </a>
+                                <a href="/" class="btn btn-outline">
+                                    <i class="fas fa-redo"></i> Create New GIF
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 GIF Creator | Easy Image to GIF Converter</p>
+        </div>
+    </footer>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Creating your GIF...</div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.upload-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all content sections
+                document.querySelectorAll('.upload-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show the corresponding content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+        
+        // File upload handling
+        function handleFileUpload(input) {
+            const previewContainer = document.getElementById('preview-container');
+            const formOptions = document.getElementById('form-options');
+            
+            previewContainer.innerHTML = '';
+            const files = input.files;
+            
+            if (files.length > 0) {
+                formOptions.style.display = 'block';
+                input.parentElement.style.borderColor = 'var(--success)';
+                
+                // Set max preview images to avoid browser slowdown
+                const maxPreviews = 20;
+                const filesToPreview = Math.min(files.length, maxPreviews);
+                
+                for (let i = 0; i < filesToPreview; i++) {
+                    const file = files[i];
+                    if (!file.type.startsWith('image/')) {
+                        continue;
+                    }
+                    
+                    const reader = new FileReader();
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    
+                    reader.onload = function(e) {
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button type="button" class="remove-btn" title="Remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                    }
+                    
+                    reader.readAsDataURL(file);
+                    previewContainer.appendChild(previewItem);
+                }
+                
+                // Add indicator if there are more files than shown
+                if (files.length > maxPreviews) {
+                    const moreIndicator = document.createElement('div');
+                    moreIndicator.className = 'preview-item';
+                    moreIndicator.style.display = 'flex';
+                    moreIndicator.style.justifyContent = 'center';
+                    moreIndicator.style.alignItems = 'center';
+                    moreIndicator.style.backgroundColor = 'var(--light-gray)';
+                    moreIndicator.innerHTML = `<span>+${files.length - maxPreviews} more</span>`;
+                    previewContainer.appendChild(moreIndicator);
+                }
+            } else {
+                formOptions.style.display = 'none';
+                input.parentElement.style.borderColor = 'var(--primary-light)';
+            }
+            
+            // Add click listeners for remove buttons - Visual only as we can't modify FileList
+            setTimeout(() => {
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        this.closest('.preview-item').remove();
+                        
+                        // If no more previews, reset form options display
+                        if (previewContainer.children.length === 0) {
+                            formOptions.style.display = 'none';
+                            document.querySelectorAll('.upload-area').forEach(area => {
+                                area.style.borderColor = 'var(--primary-light)';
+                            });
+                        }
+                    });
+                });
+            }, 100);
+        }
+        
+        // Show options toggle
+        function toggleOptions() {
+            const optionsBody = document.getElementById('options-body');
+            const toggleIcon = document.getElementById('options-toggle-icon');
+            
+            optionsBody.classList.toggle('show');
+            
+            if (optionsBody.classList.contains('show')) {
+                toggleIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                toggleIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+        
+        // Update duration value display
+        function updateDurationValue(val) {
+            document.getElementById('duration-value').textContent = val + 's';
+        }
+        
+        // Show loading overlay when form is submitted
+        document.getElementById('gif-form').addEventListener('submit', function() {
+            document.getElementById('loading-overlay').classList.add('active');
+        });
+
+        // Handle form submission
+        document.getElementById('gif-form').addEventListener('submit', function(e) {
+            const filesInput = document.getElementById('files');
+            const folderInput = document.getElementById('folder');
+            
+            // Check if either files or folder has files selected
+            if ((filesInput.files.length === 0 && folderInput.files.length === 0) || 
+                (filesInput.files.length < 2 && folderInput.files.length < 2)) {
+                e.preventDefault();
+                alert('Please select at least 2 image files to create a GIF.');
+                document.getElementById('loading-overlay').classList.remove('active');
+                return false;
+            }
+            
+            // Check if at least one valid image is selected
+            let hasValidImage = false;
+            
+            if (filesInput.files.length > 0) {
+                for (let i = 0; i < filesInput.files.length; i++) {
+                    if (filesInput.files[i].type.startsWith('image/')) {
+                        hasValidImage = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (folderInput.files.length > 0) {
+                for (let i = 0; i < folderInput.files.length; i++) {
+                    if (folderInput.files[i].type.startsWith('image/')) {
+                        hasValidImage = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!hasValidImage) {
+                e.preventDefault();
+                alert('Please select valid image files (PNG, JPG, GIF, etc.).');
+                document.getElementById('loading-overlay').classList.remove('active');
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Initialize UI on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if GIF result is shown, scroll to it
+            if (document.querySelector('.result-section')) {
+                document.querySelector('.result-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
