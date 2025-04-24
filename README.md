@@ -4,7 +4,7 @@ This is a Flask-based web app that allows users to upload multiple images, gener
 
 ## 📁 Demo Folders
 
-The project comes with three demo folders in `web_app/static/uploads/`:
+The project comes with three demo folders:
 - `team/` – Team member images
 - `chicklet/` – Chicklet meme frames
 - `nyan/` – Nyan cat animation frames
@@ -59,7 +59,7 @@ GIF_Creator/
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/Gif_Creator.git
+git clone https://github.com/raj-deshmukh6403/Gif_Creator.git
 cd Gif_Cretor
 cd web_gif_generator
 ```
